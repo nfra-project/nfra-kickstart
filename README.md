@@ -1,14 +1,8 @@
 # kickstart
 
-See [https://nfra.infracamp.org] for detailed documentation.
+See [https://nfra.infracamp.org](https://nfra.infracamp.org) for detailed documentation.
 
 ## TL;DR
-
-Download `kickstart.sh` and copy it into `/usr/bin/`. 
-
-```
-curl 
-```
 
 On your local workstation, `kickstart.sh` will:
 - Start up the container setting env `DEV_MODE=1` and giving you an **interactive shell** as user `user` inside the container.
@@ -101,8 +95,8 @@ kickstart ci-build
 sudo curl -o /usr/bin/kickstart "https://raw.githubusercontent.com/nfra-project/nfra-kickstart/master/dist/kickstart.sh" && sudo chmod +x /usr/bin/kickstart
 ```
 
-The script will save [kickstart.sh](https://raw.githubusercontent.com/infracamp/kickstart/master/dist/kickstart.sh) to the
-current directory and set the executable bit.
+The script will save [kickstart.sh](https://raw.githubusercontent.com/infracamp/kickstart/master/dist/kickstart.sh) to 
+systems /usr/bin directory and set the executalbe bit.
 
 **Run kickstart:**
 ```bash
