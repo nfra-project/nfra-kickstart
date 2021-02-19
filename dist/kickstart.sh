@@ -99,7 +99,7 @@ function on_error () {
     echo -e "\e[1;101;30m\n" 1>&2
     echo -en "KICKSTART ERROR: '$prog' (Exit code: $exit_code on ${PROGNAME} line $1) - inspect output above for more information.\n" 1>&2
     echo -e "\e[0m" 1>&2
-
+    [[ "$_docker_stack_started" != "" ]] && echo "Stopping stack $_docker_stack_started" && docker stack rm $_docker_stack_started
     exit 1
 }
 
@@ -556,7 +556,7 @@ run_container() {
             docker swarm init --advertise-addr $KICKSTART_HOST_IP || true
             docker network create --attachable -d overlay $_STACK_NETWORK_NAME
         fi;
-
+        _docker_stack_started=$CONTAINER_NAME
         docker stack deploy --prune --with-registry-auth -c $_STACKFILE $CONTAINER_NAME
         DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS --network $_STACK_NETWORK_NAME"
     fi;
@@ -601,6 +601,9 @@ run_container() {
         exit $status
     fi;
     echo -e $COLOR_WHITE "<== [kickstart.sh] CONTAINER SHUTDOWN"
+
+    [[ "$_docker_stack_started" != "" ]] && echo "Stopping stack $_docker_stack_started" && docker stack rm $_docker_stack_started
+
     echo -e $COLOR_RED "    Kickstart Exit - Goodbye" $COLOR_NC
     exit 0;
 }
@@ -795,3 +798,4 @@ then
     run_shell
 fi;
 run_container
+
