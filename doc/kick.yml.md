@@ -12,8 +12,24 @@ config_file:
     template: config.php.dist
     target: config.php
 
+# Install packages via apt-get
+packages: [package1, package2]
+
+# Set Environment Variables
+env:
+  - SOME_ENV=Some value 
+  - PATH="/some/path:$PATH"
+  - "SOME_ENV=${SOME_ENV:-defaultValue}"      # Define default environment
+
 # Execute commands
 command:
+    command_name1:
+      - "script to exec (as user)"
+        
+    command_shell: |
+      if [ -f /some/file ]; then
+         echo "file found"
+      fi;
     build:
         - "sudo cp /opt/xyz /etc/opt/xyz"
         - "echo 'This is executed on build time'"
@@ -56,7 +72,16 @@ Examples:
 define("CONF_MYSQL_HOST", "%CONF_MYSQL_HOST%");
 ```
 
+### Install packages via [apt-get](https://wiki.ubuntuusers.de/apt/apt-get/)
 
+during the start of the container, all packages specified here are searched for and, if available, also installed.
+
+##### Example:
+```yaml
+packages: [php8.0-curl, php8.0-http, php8.0-raphf, php8.0-xml]
+```
+
+the example shows all packages that needs to be installed for [phpunit](https://phpunit.de/) as an example.
 
 ### Defining commands: The `commands:`-section
 
