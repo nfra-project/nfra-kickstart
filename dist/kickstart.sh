@@ -685,7 +685,7 @@ while [ "$#" -gt 0 ]; do
         if [ "$2" == "install" ]
         then
             ask_user "Do you want to overwrite existing files with skeleton?"
-            curl $KICKSTART_SKEL_DOWNLOAD_URL | tar -xzv --strip-components=2 kickstart-skel-master/$3/ -C ./
+            curl $KICKSTART_SKEL_DOWNLOAD_URL | tar -xzv --strip-components=2 kickstart-skel-main/$3/ -C ./
             exit 0;
         fi;
 
