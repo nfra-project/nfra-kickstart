@@ -51,8 +51,8 @@ KICKSTART_USER="user"
 KICKSTART_WIN_PATH=""
 
 # For the skeleton project
-KICKSTART_SKEL_INDEX_URL="https://raw.githubusercontent.com/infracamp/nfra-skel/master/skel.index.txt"
-KICKSTART_SKEL_DOWNLOAD_URL="https://codeload.github.com/infracamp/nfra-skel/tar.gz/master"
+KICKSTART_SKEL_INDEX_URL="https://raw.githubusercontent.com/nfra-project/kickstart-skel/main/skel.index.txt"
+KICKSTART_SKEL_DOWNLOAD_URL="https://codeload.github.com/nfra-project/kickstart-skel/tar.gz/main"
 
 
 ############################
