@@ -206,6 +206,28 @@ case $1 in
     help|-h|--help)
         _usage
         exit 0;;
+
+    skel)
+        if [ "$2" == "install" ]
+        then
+            ask_user "Do you want to overwrite existing files with skeleton?"
+            curl $KICKSTART_SKEL_DOWNLOAD_URL | tar -xzv --strip-components=2 kickstart-skel-main/$3/ -C ./
+            exit 0;
+        fi;
+
+        if [ "$2" == "" ] || [ "$2" == "list" ]
+        then
+            echo "------ List of available skeleton projects -------"
+            curl $KICKSTART_SKEL_INDEX_URL
+            echo ""
+            echo "--------------------------------------------------"
+            echo "Install a skeleton: $0 skel install <name>"
+            echo "";
+        else
+            echo "Unknown command: Available: $0 --skel list|install <name>"
+            exit 1
+        fi
+        exit 0;;
 esac;
 
 
@@ -681,27 +703,7 @@ while [ "$#" -gt 0 ]; do
         docker start -ai $CONTAINER_NAME
         exit 0;;
 
-    skel)
-        if [ "$2" == "install" ]
-        then
-            ask_user "Do you want to overwrite existing files with skeleton?"
-            curl $KICKSTART_SKEL_DOWNLOAD_URL | tar -xzv --strip-components=2 kickstart-skel-main/$3/ -C ./
-            exit 0;
-        fi;
 
-        if [ "$2" == "" ] || [ "$2" == "list" ]
-        then
-            echo "------ List of available skeleton projects -------"
-            curl $KICKSTART_SKEL_INDEX_URL
-            echo ""
-            echo "--------------------------------------------------"
-            echo "Install a skeleton: $0 skel install <name>"
-            echo "";
-        else
-            echo "Unknown command: Available: $0 --skel list|install <name>"
-            exit 1
-        fi
-        exit 0;;
 
     secrets)
         secretDir="$HOME/.kickstart/secrets/$CONTAINER_NAME"
