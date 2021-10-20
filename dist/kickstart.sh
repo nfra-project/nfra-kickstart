@@ -154,6 +154,23 @@ _KICKSTART_CURRENT_VERSION="1.2.0"
 # This variables can be overwritten by ~/.kickstartconfig
 #
 
+ask_user() {
+    echo "";
+    read -r -p "$1 (y|N)" choice
+    case "$choice" in
+      n|N)
+        echo "Abort!";
+        ;;
+      y|Y)
+        return 0;
+        ;;
+
+      *)
+        echo 'Response not valid';;
+    esac
+    exit 1;
+}
+
 _usage() {
     echo -e $COLOR_NC "Usage: $0 [<arguments>] [<command>]
 
@@ -230,23 +247,6 @@ case $1 in
         exit 0;;
 esac;
 
-
-ask_user() {
-    echo "";
-    read -r -p "$1 (y|N)" choice
-    case "$choice" in
-      n|N)
-        echo "Abort!";
-        ;;
-      y|Y)
-        return 0;
-        ;;
-
-      *)
-        echo 'Response not valid';;
-    esac
-    exit 1;
-}
 
 
 if [ ! -f "$PROJECT_PATH/.kick.yml" ]
