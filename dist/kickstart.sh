@@ -154,6 +154,59 @@ _KICKSTART_CURRENT_VERSION="1.2.0"
 # This variables can be overwritten by ~/.kickstartconfig
 #
 
+_usage() {
+    echo -e $COLOR_NC "Usage: $0 [<arguments>] [<command>]
+
+    COMMANDS:
+
+        $0 :[command] [command2...]
+            Execute kick <command> and return (development mode)
+
+        $0 ci-build
+            Build the service and push to gitlab registry (gitlab_ci_runner)
+
+        $0 skel list|install [name]
+            List / Install a skeleton project (see http://github.com/infracamp/kickstart-skel)
+
+        $0 skel upgrade
+            Upgrade to the latest kickstart version
+
+        $0 secrets list
+            List all secrets stored for this project
+
+        $0 secrets edit [secret_name]
+            Edit / create secret
+
+        $0 wakeup
+            Try to start a previous image with same container name (faster startup)
+
+    EXAMPLES
+
+        $0              Just start a shell inside the container (default development usage)
+        $0 :test        Execute commands defined in section 'test' of .kick.yml
+        $0 :debug       Execute the container in debug-mode (don't execute kick-commands)
+
+    ARGUMENTS
+        -h                    Show this help
+        -t, --tag=<tagname>   Run container with this tag (development)
+        -u, --unflavored      Run the container whithout running any scripts (develpment)
+            --offline         Do not pull images nor ask for version upgrades
+            --no-tty          Disable interactive tty
+        -e, --env ENV=value   Set environment variables
+        -v, --volume  list    Bind mount a volume
+        -f, --force           Restart / kill running containers
+        -r, --reset           Shutdown all services and restart stack services
+            --update-version  Update values in VERSION file (done automatically in ci-build)
+            --create-version  Create a mock VERSION file with fixed values (can be committed to repo)
+    "
+    exit 1
+}
+
+case $1 in
+    help|-h|--help)
+        _usage
+        exit 0;;
+esac;
 
 
 ask_user() {
@@ -176,7 +229,7 @@ ask_user() {
 
 if [ ! -f "$PROJECT_PATH/.kick.yml" ]
 then
-    echo -e $COLOR_RED "[ERR] Missing $PROJECT_PATH/.kick.yml file." $COLOR_NC
+    echo -e $COLOR_RED "[ERR] Missing $PROJECT_PATH/.kick.yml file. (See 'kickstart -h' for more information)" $COLOR_NC
     ask_user "Do you want to create a new .kick.yml-file?"
     echo "# Kickstart container config file - see https://gitub.com/infracamp/kickstart" > $PROJECT_PATH/.kick.yml
     echo "# Run ./kickstart.sh to start a development-container for this project" >> $PROJECT_PATH/.kick.yml
@@ -229,53 +282,7 @@ then
     terminal="-t"
 fi;
 
-_usage() {
-    echo -e $COLOR_NC "Usage: $0 [<arguments>] [<command>]
 
-    COMMANDS:
-
-        $0 :[command] [command2...]
-            Execute kick <command> and return (development mode)
-
-        $0 ci-build
-            Build the service and push to gitlab registry (gitlab_ci_runner)
-
-        $0 skel list|install [name]
-            List / Install a skeleton project (see http://github.com/infracamp/kickstart-skel)
-
-        $0 skel upgrade
-            Upgrade to the latest kickstart version
-
-        $0 secrets list
-            List all secrets stored for this project
-
-        $0 secrets edit [secret_name]
-            Edit / create secret
-
-        $0 wakeup
-            Try to start a previous image with same container name (faster startup)
-
-    EXAMPLES
-
-        $0              Just start a shell inside the container (default development usage)
-        $0 :test        Execute commands defined in section 'test' of .kick.yml
-        $0 :debug       Execute the container in debug-mode (don't execute kick-commands)
-
-    ARGUMENTS
-        -h                    Show this help
-        -t, --tag=<tagname>   Run container with this tag (development)
-        -u, --unflavored      Run the container whithout running any scripts (develpment)
-            --offline         Do not pull images nor ask for version upgrades
-            --no-tty          Disable interactive tty
-        -e, --env ENV=value   Set environment variables
-        -v, --volume  list    Bind mount a volume
-        -f, --force           Restart / kill running containers
-        -r, --reset           Shutdown all services and restart stack services
-            --update-version  Update values in VERSION file (done automatically in ci-build)
-            --create-version  Create a mock VERSION file with fixed values (can be committed to repo)
-    "
-    exit 1
-}
 
 
 _print_header() {
