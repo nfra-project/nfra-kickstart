@@ -278,6 +278,19 @@ fi
 
 # Parse .kick.yml for line from: "docker/container:version"
 FROM_IMAGE=`cat $PROJECT_PATH/.kick.yml | grep "^from:" | tr -d '"' | awk '{print $2}'`
+
+# Parse .kick.yml for line ports:
+_ports_line=`cat $PROJECT_PATH/.kick.yml | grep '^ports:' | cat`;
+
+if [ "$_ports_line" != "" ]
+then
+    KICKSTART_PORTS=`echo $_ports_line | tr -d '"' | awk '{print $2}'`
+    echo "Exposing on ports: '$KICKSTART_PORTS' (defined in .kick.yml)"
+else
+    echo "Exposing on ports: '$KICKSTART_PORTS' (default)"
+fi;
+
+
 if [ "$FROM_IMAGE" == "" ]
 then
     echo -e $COLOR_RED "[ERR] .kick.yml file does not include 'from:' - directive." $COLOR_NC
