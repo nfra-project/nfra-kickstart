@@ -257,7 +257,8 @@ then
     echo "# Run ./kickstart.sh to start a development-container for this project" >> $PROJECT_PATH/.kick.yml
 
     echo "version: 1" >> $PROJECT_PATH/.kick.yml
-    echo 'from: "nfra/kickstart-flavor-base"' >> $PROJECT_PATH/.kick.yml
+    echo 'from: "nfra/kickstart-flavor-bare:1.0"' >> $PROJECT_PATH/.kick.yml
+    echo 'ports: "80:80;4000:4000;4100:4100"' >> $PROJECT_PATH/.kick.yml
     echo "command:"     >> $PROJECT_PATH/.kick.yml
     echo "  build:"     >> $PROJECT_PATH/.kick.yml
     echo "    - \"echo 'I am executed on build time'\""    >> $PROJECT_PATH/.kick.yml
