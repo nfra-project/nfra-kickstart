@@ -111,7 +111,7 @@ at least the `from:`-Line.
 
 ```yaml
 version: 1
-from: "infracamp/kickstart-flavor-ubuntu"
+from: "nfra/kickstart-flavor-bare:1.0"
 ports: "80:80;4000:4000"
 
 ..more options..
@@ -123,7 +123,7 @@ To select a special flavor select
 
 ```yaml
 version: 1
-from: "infracamp/kickstart-flavor-gaia"
+from: "nfra/kickstart-flavor-bare:1.0"
 ```
 
 
