@@ -112,6 +112,7 @@ at least the `from:`-Line.
 ```yaml
 version: 1
 from: "infracamp/kickstart-flavor-ubuntu"
+ports: "80:80;4000:4000"
 
 ..more options..
 ```
