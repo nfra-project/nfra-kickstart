@@ -456,7 +456,7 @@ run_shell() {
 versionFile="${PROJECT_PATH}/VERSION"
 
 _write_version_file_real() {
-    [ -f $versionFile ] || return; # Skip if VERSION is not present
+    [ -f $versionFile ] || return 0; # Skip if VERSION is not present
 
     echo "Updating Version file $versionFile";
 
@@ -739,7 +739,7 @@ while [ "$#" -gt 0 ]; do
 
     ci-build|--ci-build)
         _ci_build $2 $3
-        exit0;;
+        exit 0;;
 
     help|-h|--help)
         _usage
