@@ -522,6 +522,17 @@ _ci_build() {
 }
 
 
+_reset_services() {
+    echo "Resetting services (Removing all Docker Stacks & Services)..."
+    docker stack ls | awk 'NR>1 {print $1}' | while read -r stack; do
+      docker stack rm "$stack"
+    done
+    docker service ls | awk 'NR>1 {print $1}' | while read -r service; do
+      docker service rm "$service"
+    done
+    sleep 1;
+}
+
 
 DOCKER_OPT_PARAMS=$KICKSTART_DOCKER_RUN_OPTS;
 
@@ -589,7 +600,7 @@ run_container() {
         if [ $resetServices -eq 1 ]
         then
           echo "Reset Services. Leaving swarm..."
-          docker swarm leave --force
+          _reset_services
         fi;
 
         echo "Startin in stack mode... (network: '$_STACK_NETWORK_NAME')"
@@ -779,7 +790,7 @@ fi
 if [ -e "$HOME/.bash_history" ]
 then
     bashHistoryFile="$HOME/.kickstart/bash_history/$CONTAINER_NAME";
-    echo "Mounting containers bash-history from $bashHistroyFile..."
+    echo "Mounting containers bash-history from $bashHistoryFile..."
     mkdir -p $(dirname $bashHistoryFile)
     touch $bashHistoryFile
     DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $bashHistoryFile:/home/user/.bash_history";
