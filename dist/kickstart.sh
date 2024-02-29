@@ -218,7 +218,7 @@ _usage() {
             --create-version  Create a mock VERSION file with fixed values (can be committed to repo)
     "
     exit 1
-}ip route list | grep -v default | grep -v linkdown | grep src | tail -1 | awk 'match($0, / [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/){print substr($0, RSTART+1, RLENGTH-1)}'
+}
 
 case $1 in
     help|-h|--help)
