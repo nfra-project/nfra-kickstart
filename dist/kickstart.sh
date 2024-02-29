@@ -213,11 +213,12 @@ _usage() {
         -v, --volume  list    Bind mount a volume
         -f, --force           Restart / kill running containers
         -r, --reset           Shutdown all services and restart stack services
+            --upgrade         Check for the latest version of kickstart and install (requires sudo)
             --update-version  Update values in VERSION file (done automatically in ci-build)
             --create-version  Create a mock VERSION file with fixed values (can be committed to repo)
     "
     exit 1
-}
+}ip route list | grep -v default | grep -v linkdown | grep src | tail -1 | awk 'match($0, / [0-9]+\.[0-9]+\.[0-9]+\.[0-9]+/){print substr($0, RSTART+1, RLENGTH-1)}'
 
 case $1 in
     help|-h|--help)
