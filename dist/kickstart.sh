@@ -45,6 +45,11 @@ DOCKER_MOUNT_PARAMS="-v $PROJECT_PATH/:/opt/"
 # User to run inside the container (Default: 'user')
 KICKSTART_USER="user"
 
+# The default stack name if not set in .kick.yaml
+KICKSTART_STACK_NAME="kickstart-stack";
+
+# Where to search for secrets
+KICKSTART_SECRETS_DIR="$HOME/.kickstart/secrets"
 
 # For WINDOWS (WSL) users only: Change this for mapping from wsl to docker4win. Execute this in linux shell:
 # `echo "KICKSTART_WIN_PATH=C:/" >> ~/.kickstartconfig`
@@ -291,6 +296,29 @@ then
 else
     echo "Exposing on ports: '$KICKSTART_PORTS' (default)"
 fi;
+
+
+## Determine the stack name from .kick.yml - if not set, use value from KICKSTART_STACK_NAME
+_stack_name=`cat $PROJECT_PATH/.kick.yml | grep "^stack:" | tr -d '"' | awk '{print $2}'`
+if [ "$_stack_name" != "" ]
+then
+    KICKSTART_STACK_NAME=$_stack_name
+fi;
+
+
+
+
+## Determine secrets from .kick.yml (array - split by , or space)
+_secrets_line=`cat $PROJECT_PATH/.kick.yml | grep "^secrets:" | tr -d '"' | awk '{print $2}'`
+## Make a array of secrets
+if [[ -z "$_secrets_line" ]]; then
+  _secrets_arr=()
+else
+  read -a _secrets_arr <<< "$_secrets_line"
+fi
+
+
+
 
 
 if [ "$FROM_IMAGE" == "" ]
@@ -564,6 +592,17 @@ run_container() {
         echo -e $COLOR_RED "OFFLINE MODE! Not pulling image from registy. " $COLOR_NC
     fi;
 
+    ## Look in KICKSTART_SECRET_DIR for secrets - if not found, issue a error
+    for _secret in "${_secrets_arr[@]}"
+    do
+        if [ ! -e "$KICKSTART_SECRETS_DIR/$_secret" ]
+        then
+            echo -e $COLOR_RED "[ERR] Secret '$_secret' not found in $KICKSTART_SECRETS_DIR" $COLOR_NC
+            echo  "Run 'kickstart secrets edit $_secret' to create the secret!"
+            exit 1
+        fi;
+    done
+
     # Ports to be exposed
     IFS=';' read -r -a _ports <<< "$KICKSTART_PORTS"
     for _port in "${_ports[@]}"
@@ -594,15 +633,27 @@ run_container() {
     echo -e $COLOR_WHITE "==> [$0] STARTING CONTAINER (docker run): Running container in dev-mode..." $COLOR_NC
 
 
+
+
     _STACKFILE="$PROJECT_PATH/.kick-stack.yml"
     if [ -e "$_STACKFILE" ]; then
-        _STACK_NETWORK_NAME=$CONTAINER_NAME
+        _STACK_NETWORK_NAME=$KICKSTART_STACK_NAME
 
         if [ $resetServices -eq 1 ]
         then
           echo "Reset Services. Leaving swarm..."
           _reset_services
         fi;
+
+        # Remove all docker service ls secrets
+        docker secret ls -q | xargs docker secret rm
+
+        # Create the secrets as docker secrets
+        for _secret in "${_secrets_arr[@]}"
+        do
+            echo "Creating docker secret $_secret"
+            docker secret create $_secret $KICKSTART_SECRETS_DIR/$_secret
+        done
 
         echo "Startin in stack mode... (network: '$_STACK_NETWORK_NAME')"
         _NETWORKS=$(docker network ls | grep $_STACK_NETWORK_NAME | wc -l)
@@ -611,8 +662,8 @@ run_container() {
             docker swarm init --advertise-addr $KICKSTART_HOST_IP || true
             docker network create --attachable -d overlay $_STACK_NETWORK_NAME
         fi;
-        _docker_stack_started=$CONTAINER_NAME
-        docker stack deploy --prune --with-registry-auth -c $_STACKFILE $CONTAINER_NAME
+        _docker_stack_started=$_STACK_NETWORK_NAME
+        docker stack deploy --prune --with-registry-auth -c $_STACKFILE $_STACK_NETWORK_NAME
         DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS --network $_STACK_NETWORK_NAME"
     fi;
 
@@ -632,6 +683,22 @@ run_container() {
         # (otherwise composer / npm won't install)
         dev_uid=1000
     fi;
+
+
+    ## Add SSH_Agent to Auth Socket
+    if [ -e "$SSH_AUTH_SOCK" ]
+    then
+        DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent"
+        ## Bind the usb devices to the container
+
+    fi;
+
+    for _secret in "${_secrets_arr[@]}"
+    do
+        echo "Mounting secret '$_secret' to /run/secrets/$_secret"
+        DOCKER_MOUNT_PARAMS="$DOCKER_MOUNT_PARAMS -v $KICKSTART_SECRETS_DIR/$_secret:/run/secrets/$_secret"
+    done
+
 
     cmd="docker $KICKSTART_DOCKER_OPTS run $terminal                \
             $DOCKER_MOUNT_PARAMS                           \
@@ -732,7 +799,7 @@ while [ "$#" -gt 0 ]; do
 
 
     secrets)
-        secretDir="$HOME/.kickstart/secrets/$CONTAINER_NAME"
+        secretDir=$KICKSTART_SECRETS_DIR
         mkdir -p $secretDir
 
         [[ "$2" == "list" ]] && echo "Listing secrets from $secretDir:" && ls $secretDir && exit 0;

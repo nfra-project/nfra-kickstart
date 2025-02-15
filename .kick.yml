@@ -2,7 +2,8 @@
 # Run ./kickstart.sh to start a development-container for this project
 version: 1
 from: "infracamp/kickstart-flavor-base"
-
+secrets:
+stack:
 
 command:
   build:

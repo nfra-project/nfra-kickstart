@@ -113,8 +113,9 @@ at least the `from:`-Line.
 version: 1
 from: "nfra/kickstart-flavor-bare:1.0"
 ports: "80:80;4000:4000"
-
-..more options..
+secrets: "some_secret keystore.yml"
+stack:
+    ..more options..
 ```
 
 Run `kickstart` - the container should start.
