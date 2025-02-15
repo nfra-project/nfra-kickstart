@@ -652,6 +652,7 @@ run_container() {
         for _secret in "${_secrets_arr[@]}"
         do
             echo "Creating docker secret $_secret"
+            docker secret rm $_secret || true ## Remove old secret
             docker secret create $_secret $KICKSTART_SECRETS_DIR/$_secret
         done
 
