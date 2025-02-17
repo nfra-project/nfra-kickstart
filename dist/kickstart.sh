@@ -645,9 +645,6 @@ run_container() {
           _reset_services
         fi;
 
-        # Remove all docker service ls secrets
-        docker secret ls -q | xargs docker secret rm
-
         # Create the secrets as docker secrets
         for _secret in "${_secrets_arr[@]}"
         do
