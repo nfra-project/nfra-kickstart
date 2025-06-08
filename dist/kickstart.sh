@@ -610,16 +610,6 @@ run_container() {
         DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -p $_port"
     done
 
-    ## Mutliarch support
-    ##imageArchitecture=$( docker image inspect "$FROM_IMAGE" -f '{{.Architecture}}')
-    isArmImage=$(echo "$FROM_IMAGE" | grep "arm32v7") || true
-    isX86=$(uname -m | grep "x86") || true
-
-    if [ "$isX86" != "" ] && [ "$isArmImage" != '' ]
-    then
-        ask_user "You are trying to load arm32 image on x86 architecture. Enable multiarch/qemu?"
-        docker run --rm --privileged multiarch/qemu-user-static:register --reset --credential yes
-    fi
 
 	if [ "$KICKSTART_WIN_PATH" != "" ]
 	then
@@ -682,14 +672,6 @@ run_container() {
         dev_uid=1000
     fi;
 
-
-    ## Add SSH_Agent to Auth Socket
-    if [ -e "$SSH_AUTH_SOCK" ]
-    then
-        DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent"
-        ## Bind the usb devices to the container
-
-    fi;
 
     for _secret in "${_secrets_arr[@]}"
     do
