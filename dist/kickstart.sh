@@ -817,10 +817,22 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-if [ -e "$HOME/.ssh" ]
+if [ -e "$HOME/.ssh/known_hosts" ]
 then
-    echo "Mounting $HOME/.ssh..."
-    DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $HOME/.ssh:/home/user/.ssh";
+    echo "Mounting $HOME/.ssh/known_hosts..."
+    DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $HOME/.ssh/known_hosts:/home/user/.ssh/known_hosts";
+fi
+
+
+if [ -e "$SSH_AUTH_SOCK" ]
+then
+    agentSocket=$SSH_AUTH_SOCK
+    agentSocketExists=$(readlink -f "$agentSocket")
+
+    echo "Mounting SSH Agent Socket... ${agentSocketExists}"
+    DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $SSH_AUTH_SOCK:/ssh-agent:Z -e SSH_AUTH_SOCK=/ssh-agent";
+else
+    echo "No SSH_AUTH_SOCK Agent Socket found - skipping mount"
 fi
 
 if [ -e "$HOME/.gitconfig" ]
