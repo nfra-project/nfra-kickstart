@@ -680,17 +680,7 @@ run_container() {
     done
 
 
-    cmd="docker $KICKSTART_DOCKER_OPTS run $terminal                \
-            $DOCKER_MOUNT_PARAMS                           \
-            -e \"DEV_CONTAINER_NAME=$CONTAINER_NAME\"         \
-            -e \"DEV_TTYID=[MAIN]\"                           \
-            -e \"DEV_UID=$dev_uid\"                               \
-            -e \"DOCKER_HOST_IP=$KICKSTART_HOST_IP\"               \
-            -e \"TERM=$TERM\"                                 \
-            -e \"DEV_MODE=1\"                                 \
-            $DOCKER_OPT_PARAMS                              \
-            --name $CONTAINER_NAME                          \
-            $FROM_IMAGE $ARGUMENT"
+    cmd="docker ${KICKSTART_DOCKER_OPTS} run ${terminal} ${DOCKER_MOUNT_PARAMS} -e DEV_CONTAINER_NAME=${CONTAINER_NAME} -e DEV_TTYID=[MAIN] -e DEV_UID=${dev_uid} -e DOCKER_HOST_IP=${KICKSTART_HOST_IP} -e TERM=${TERM} -e DEV_MODE=1 ${DOCKER_OPT_PARAMS} --name ${CONTAINER_NAME} ${FROM_IMAGE} ${ARGUMENT}"
     echo [exec] $cmd
     eval $cmd
 
