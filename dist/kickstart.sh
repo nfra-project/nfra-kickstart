@@ -308,13 +308,14 @@ fi;
 
 
 
-## Determine secrets from .kick.yml (array - split by , or space)
-_secrets_line=`cat $PROJECT_PATH/.kick.yml | grep "^secrets:" | tr -d '"' | awk '{print $2}'`
-## Make a array of secrets
+## Determine secrets from .kick.yml (array - split by , or space, including spaces around commas)
+_secrets_line=$(grep "^secrets:" "$PROJECT_PATH/.kick.yml" | head -n1 | sed 's/^secrets:[[:space:]]*//' | tr -d '"')
+## Make an array of secrets
 if [[ -z "$_secrets_line" ]]; then
   _secrets_arr=()
 else
-  read -a _secrets_arr <<< "$_secrets_line"
+  _secrets_line=$(echo "$_secrets_line" | sed -E 's/[[:space:]]*,[[:space:]]*/ /g; s/^[[:space:]]+//; s/[[:space:]]+$//')
+  read -r -a _secrets_arr <<< "$_secrets_line"
 fi
 
 
