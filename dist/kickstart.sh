@@ -653,7 +653,8 @@ run_container() {
         fi;
         _docker_stack_started=$_STACK_NETWORK_NAME
         docker stack deploy --prune --with-registry-auth -c $_STACKFILE $_STACK_NETWORK_NAME
-        DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS --network $_STACK_NETWORK_NAME"
+        ## Network can be connected from other contiainers vias hostname "main"
+        DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS --network $_STACK_NETWORK_NAME" --network-alias main
     fi;
 
 
