@@ -176,6 +176,25 @@ ask_user() {
     exit 1;
 }
 
+_detect_editor() {
+    if [[ -n "$EDITOR" ]]; then
+        echo "$EDITOR"
+        return 0
+    fi
+
+    if command -v vim >/dev/null 2>&1; then
+        echo "vim"
+        return 0
+    fi
+
+    if command -v nano >/dev/null 2>&1; then
+        echo "nano"
+        return 0
+    fi
+
+    return 1
+}
+
 _usage() {
     echo -e $COLOR_NC "Usage: $0 [<arguments>] [<command>]
 
@@ -782,7 +801,8 @@ while [ "$#" -gt 0 ]; do
 
         secretFile=$secretDir/$3
 
-        editor $secretFile
+        _editor=$(_detect_editor) || { echo "Error: No editor found. Set \$EDITOR or install vim/nano."; exit 1; }
+        $_editor "$secretFile"
         echo "Edit successful: $secretFile"
 
         exit 0;;
@@ -884,4 +904,3 @@ then
     run_shell
 fi;
 run_container
-
