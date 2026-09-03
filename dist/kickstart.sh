@@ -870,11 +870,13 @@ fi
 
 if [ -d "$HOME/.agents/skills" ]
 then
-    echo "Mounting $HOME/.agents/skills..."
+    ## By default skills are mounted read-only. If the user wants to mount them read-write, he can use the --agents-skills-rw option
     if [ "$KICKSTART_AGENTS_SKILLS_RW" -eq 1 ]
     then
+        echo "Mounting $HOME/.agents/skills read-write (rw)"
         DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $HOME/.agents/skills:/home/user/.agents/skills"
     else
+        echo "Mounting $HOME/.agents/skills read-only (ro) use --agents-skills-rw to mount read-write"
         DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $HOME/.agents/skills:/home/user/.agents/skills:ro"
     fi
 fi
