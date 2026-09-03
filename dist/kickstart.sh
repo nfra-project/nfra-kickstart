@@ -24,6 +24,9 @@ KICKSTART_DOCKER_OPTS=""
 # Optinal parameters for docker run (e.g. -v /some/host/path:/path)
 KICKSTART_DOCKER_RUN_OPTS=""
 
+# Mount ~/.agents/skills read-write when enabled (default: read-only)
+KICKSTART_AGENTS_SKILLS_RW=0
+
 # External Port bindings
 KICKSTART_PORTS="80:80/tcp;4000:4000/tcp;4100:4100/tcp;4200:4200/tcp;4000:4000/udp"
 
@@ -237,6 +240,7 @@ _usage() {
         -v, --volume  list    Bind mount a volume
         -f, --force           Restart / kill running containers
         -r, --reset           Shutdown all services and restart stack services
+            --agents-skills-rw  Mount ~/.agents/skills read-write
             --upgrade         Check for the latest version of kickstart and install (requires sudo)
             --update-version  Update values in VERSION file (done automatically in ci-build)
             --create-version  Create a mock VERSION file with fixed values (can be committed to repo)
@@ -748,6 +752,11 @@ while [ "$#" -gt 0 ]; do
         shift 1;
         ;;
 
+    --agents-skills-rw)
+        KICKSTART_AGENTS_SKILLS_RW=1;
+        shift 1;
+        ;;
+
     --update-version)
         _write_version_file_dev
         _write_version_file_real
@@ -857,6 +866,17 @@ if [ -e "$HOME/.git-credentials" ]
 then
     echo "Mounting $HOME/.git-credentials..."
     DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $HOME/.git-credentials:/home/user/.git-credentials";
+fi
+
+if [ -d "$HOME/.agents/skills" ]
+then
+    echo "Mounting $HOME/.agents/skills..."
+    if [ "$KICKSTART_AGENTS_SKILLS_RW" -eq 1 ]
+    then
+        DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $HOME/.agents/skills:/home/user/.agents/skills"
+    else
+        DOCKER_OPT_PARAMS="$DOCKER_OPT_PARAMS -v $HOME/.agents/skills:/home/user/.agents/skills:ro"
+    fi
 fi
 
 if [ -e "$HOME/.bash_history" ]
